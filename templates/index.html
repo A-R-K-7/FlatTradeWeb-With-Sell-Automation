@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading UI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .group {
+      margin-bottom: 20px;
+      border: 1px solid #444;
+      padding: 10px;
+      border-radius: 5px;
+      width: fit-content;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    label {
+      margin-right: 10px;
+      font-size: 14px;
+    }
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-right: 10px;
+      text-align: center;
+    }
+    button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .btn-green {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .btn-red {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .table-container {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #333;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .fixed-ltp {
+      display: inline-block;
+      width: 70px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #444;
+    }
+    .tab {
+      cursor: pointer;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-bottom: 2px solid transparent;
+      color: #ffffff;
+    }
+    .tab.active {
+      border-bottom: 2px solid #28a745;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <label><h3>NF LTP : <span id="nifty-ltp-value" class="fixed-ltp">Loading...</span></h3></label>
+      <button>RUN</button>
+      <input type="date">
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('main-page')">Execution</div>
+      <div class="tab" onclick="showTab('group1-page')">Premium Diff</div>
+    </div>
+    <div id="main-page" class="tab-content active">
+
+
+    <!-- First Group -->
+    <div class="group">
+      <div class="row">
+        <label>CE</label>
+        <input type="number" value="0" class="ce-input" readonly>
+        <button class="btn-green" onclick="changeValue(this, 50)">▲</button>
+        <button class="btn-red" onclick="changeValue(this, -50)">▼</button>
+        <label class="fixed-ltp"><span id="set1-ce-ltp">CE LTP </span></label>
+<!--        <label>BQT</label>-->
+          <button class="btn-green" onclick="partial_buy(0,'ce-input','bqt-input')">B</button>
+        <button class="btn-red" onclick="partial_sell(0,'ce-input','bqt-input')">S</button>
+        <input type="number" value=150 class="bqt-input" readonly>
+        <button class="btn-green" onclick="changeValueBQT(this, 75)">+</button>
+        <button class="btn-red" onclick="changeValueBQT(this, -75)">-</button>
+
+        <button class="btn-green" onclick="full_buy(0)">Buy O</button>
+      </div>
+      <div class="row">
+        <label>PE</label>
+        <input type="number" value="0" class="pe-input" readonly>
+        <button class="btn-green" onclick="changeValue(this, 50)">▲</button>
+        <button class="btn-red" onclick="changeValue(this, -50)">▼</button>
+        <label class="fixed-ltp"><span id="set1-pe-ltp">PE LTP</span></label>
+<!--        <label>SQT</label>-->
+          <button class="btn-green" onclick="partial_buy(0,'pe-input','sqt-input')">B</button>
+        <button class="btn-red" onclick="partial_sell(0,'pe-input','sqt-input')">S</button>
+        <input type="number" value="150" class="sqt-input" readonly>
+        <button class="btn-green" onclick="changeValueSQT(this, 75)">+</button>
+        <button class="btn-red" onclick="changeValueSQT(this, -75)">-</button>
+
+        <button class="btn-red" onclick="full_sell(0)">Sell O</button>
+      </div>
+      <div class="row">
+        <label style="margin-left: 200px;" id="cp-1">CP</label>
+      </div>
+    </div>
+
+    <!-- Second Group -->
+    <div class="group">
+      <div class="row">
+        <label>CE</label>
+        <input type="number" value="0" class="ce-input" readonly>
+        <button class="btn-green" onclick="changeValue(this, 50)">▲</button>
+        <button class="btn-red" onclick="changeValue(this, -50)">▼</button>
+        <label class="fixed-ltp"><span id="set2-ce-ltp">CE LTP</span></label>
+          <button class="btn-green" onclick="partial_buy(1,'ce-input','bqt-input')">B</button>
+        <button class="btn-red" onclick="partial_sell(1,'ce-input','bqt-input')">S</button>
+        <input type="number" value="150" class="bqt-input" readonly>
+        <button class="btn-green" onclick="changeValueBQT(this, 75)">+</button>
+        <button class="btn-red" onclick="changeValueBQT(this, -75)">-</button>
+
+        <button class="btn-green" onclick="full_buy(1)">Buy O</button>
+      </div>
+      <div class="row">
+        <label>PE</label>
+        <input type="number" value="0" class="pe-input" readonly>
+        <button class="btn-green" onclick="changeValue(this, 50)">▲</button>
+        <button class="btn-red" onclick="changeValue(this, -50)">▼</button>
+        <label class="fixed-ltp"><span id="set2-pe-ltp">PE LTP</span></label>
+<!--        <label>SQT</label>-->
+          <button class="btn-green" onclick="partial_buy(1,'pe-input','sqt-input')">B</button>
+        <button class="btn-red" onclick="partial_sell(1,'pe-input','sqt-input')">S</button>
+        <input type="number" value="150" class="sqt-input" readonly>
+        <button class="btn-green" onclick="changeValueSQT(this, 75)">+</button>
+        <button class="btn-red" onclick="changeValueSQT(this, -75)">-</button>
+
+        <button class="btn-red" onclick="full_sell(1)">Sell O</button>
+      </div>
+      <div class="row">
+        <label style="margin-left: 200px;" id="cp-2">CP</label>
+        <label id="total-pnl" style="margin-left: 100px">Total P&L</label>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div id="group1-page" class="tab-content">
+      <!-- First Group -->
+      <div class="group">
+        <div class="row">
+<!--          <label>CE</label>-->
+<!--          <input type="number" value="0" class="ce-input" readonly>-->
+<!--          <button class="btn-green" onclick="changeValue(this, 50)">▲</button>-->
+<!--          <button class="btn-red" onclick="changeValue(this, -50)">▼</button>-->
+          <label for="sell-premium">SeLL_Prem</label>
+          <input type ="number" id="sell-premium" value= "50" min="0" readonly>
+          <button class="btn-green" onclick="incDiff('sell-premium',2)">+2</button>
+          <button class="btn-green" onclick="incDiff('sell-premium',5)">+5</button>
+          <button class="btn-red" onclick="dicDiff('sell-premium',2)">-2</button>
+          <button class="btn-red" onclick="dicDiff('sell-premium',5)">-5</button>
+          <label class="fixed-ltp"><span id="tab2-ce-ltp1">CE LTP</span></label>
+          <label class="fixed-ltp"><span id="tab2-pe-ltp1">PE LTP</span></label>
+          <label id="cp-3">CP</label>
+          <input type="number" value=150 class="bqt-input" id="sell_quant" readonly>
+          <button class="btn-green" onclick="changeValueBQT(this, 75);send_diff()">+</button>
+          <button class="btn-red" onclick="changeValueBQT(this, -75);send_diff()">-</button>
+
+          <button class="btn-green" onclick="run_premium_diff()">Start</button>
+        </div>
+
+        <div class="row">
+<!--          <label>PE</label>-->
+<!--          <input type="number" value="0" class="pe-input" readonly>-->
+          <label for="hedge-premium">HedgePrem</label>
+          <input type ="number" id="hedge-premium" value= "3" min="0" readonly>
+          <button class="btn-green" onclick="incDiff('hedge-premium',2)">+2</button>
+          <button class="btn-green" onclick="incDiff('hedge-premium',5)">+5</button>
+          <button class="btn-red" onclick="dicDiff('hedge-premium',2)">-2</button>
+          <button class="btn-red" onclick="dicDiff('hedge-premium',5)">-5</button>
+<!--          <button class="btn-green" onclick="changeValue(this, 50)">▲</button>-->
+<!--          <button class="btn-red" onclick="changeValue(this, -50)">▼</button>-->
+          <label class="fixed-ltp"><span id="tab2-ce-ltp2">CE LTP</span></label>
+          <label class="fixed-ltp"><span id="tab2-pe-ltp2">PE LTP </span></label>
+          <label id="cp-4">CP</label>
+          <input type="number" value="150" class="sqt-input" id="hedge_quant" readonly>
+          <button class="btn-green" onclick="changeValueSQT(this, 75);send_diff()">+</button>
+          <button class="btn-red" onclick="changeValueSQT(this, -75);send_diff()">-</button>
+
+          <button class="btn-red" onclick="stop_premium_diff()">Exit</button>
+        </div>
+
+        <div class="row">
+          <label style="margin-left: 200px;" id="cp">CP</label>
+          <label for="diff" style="margin-left: 130px">Change Diffe</label>
+          <input type ="number" id="diff" value= "15" min="0" readonly>
+          <button class="btn-green" onclick="incDiff('diff',1)">+</button>
+          <button class="btn-red" onclick="dicDiff('diff',1)">-</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-red" style="margin-left: 495px;" onclick="exit_all()">Exit All</button>
+    <!-- Positions Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Instrument</th>
+            <th>NetQTY</th>
+            <th>Prc</th>
+            <th>PNL</th>
+          </tr>
+        </thead>
+        <tbody id="positions-table"></tbody>
+      </table>
+    </div>
+    </div>
+</body>
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+<script>
+    const socket = io(); // Initialize WebSocket connection
+
+    function run_premium_diff(){
+          const sell_prem = document.getElementById('sell-premium').value;
+          const hedge_prem = document.getElementById('hedge-premium').value;
+
+          const sell_quant = document.getElementById('sell_quant').value;
+          const hedge_quant = document.getElementById('hedge_quant').value;
+
+          const difference = document.getElementById('diff').value
+          send_diff();
+          socket.emit('run_premium_diff');
+
+    }
+
+    function stop_premium_diff(){
+        socket.emit('stop_premium_diff');
+    }
+    function incDiff(field,no){
+      var diff = document.getElementById(field);
+      diff.value = parseInt(diff.value)+no;
+      send_diff();
+    }
+    function dicDiff(field,no){
+      var diff = document.getElementById(field);
+      if(diff.value <= 0){
+        return;
+      }
+      diff.value = parseInt(diff.value)-no;
+      send_diff();
+    }
+    function send_diff(){
+          const sell_prem = document.getElementById('sell-premium').value;
+          const hedge_prem = document.getElementById('hedge-premium').value;
+
+          const sell_quant = document.getElementById('sell_quant').value;
+          const hedge_quant = document.getElementById('hedge_quant').value;
+
+          const difference = document.getElementById('diff').value
+
+          socket.emit('send_diff',{
+            set1: { sell_prem: sell_prem, hedge_prem: hedge_prem},
+            set2: { sell_quant: sell_quant, hedge_quant: hedge_quant},
+            difference : difference
+      });
+    }
+
+    function showTab(tabId) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+
+      // Show the selected tab content and set the tab as active
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+    }
+
+    socket.on('auto_ltps', function (data){
+        var tab2_ce_ltp1 = data.auto_sell_ltps.ce_ltp;
+      var tab2_pe_ltp1 = data.auto_sell_ltps.pe_ltp;
+      var tab2_ce_ltp2 = data.auto_hedge_ltps.ce_ltp;
+      var tab2_pe_ltp2 = data.auto_hedge_ltps.pe_ltp;
+
+    if (tab2_ce_ltp1>0){
+      document.getElementById('tab2-ce-ltp1').innerText = tab2_ce_ltp1;
+    }
+    if (tab2_pe_ltp1>0){
+      document.getElementById('tab2-pe-ltp1').innerText = tab2_pe_ltp1;
+    }
+    if (tab2_ce_ltp2>0){
+      document.getElementById('tab2-ce-ltp2').innerText = tab2_ce_ltp2;
+    }
+    if (tab2_pe_ltp2>0){
+      document.getElementById('tab2-pe-ltp2').innerText = tab2_pe_ltp2;
+    }
+
+
+
+    // Update the UI with the LTP values
+
+      tab2_ce_ltp1 =parseFloat(document.getElementById('tab2-ce-ltp1').innerText);
+      tab2_pe_ltp1 =parseFloat(document.getElementById('tab2-pe-ltp1').innerText);
+      tab2_ce_ltp2 =parseFloat(document.getElementById('tab2-ce-ltp2').innerText);
+      tab2_pe_ltp2 =parseFloat(document.getElementById('tab2-pe-ltp2').innerText);
+
+      document.getElementById('cp-3').textContent = (tab2_ce_ltp1+tab2_pe_ltp1).toFixed(2);
+
+      document.getElementById('cp-4').textContent = (tab2_ce_ltp2+tab2_pe_ltp2).toFixed(2);
+
+    })
+    function changeValue(button, changeAmount) {
+      const input = button.parentElement.querySelector('input[type="number"]');
+      input.value = parseInt(input.value) + changeAmount;
+      sendDataToBackend(); // Send data to backend on change
+    }
+
+    function changeValueBQT(button, changeAmount) {
+      const input = button.parentElement.querySelector('.bqt-input');
+      input.value = parseInt(input.value) + changeAmount;
+    }
+
+    function changeValueSQT(button, changeAmount) {
+      const input = button.parentElement.querySelector('.sqt-input');
+      input.value = parseInt(input.value) + changeAmount;
+    }
+    function sendDataToBackend() {
+      const ceValue1 = document.getElementsByClassName('ce-input')[0].value;
+      const peValue1 = document.getElementsByClassName('pe-input')[0].value;
+
+      const ceValue2 = document.getElementsByClassName('ce-input')[1].value;
+      const peValue2 = document.getElementsByClassName('pe-input')[1].value;
+//      console.log(ceValue1,ceValue2,peValue1,peValue2);
+      // Send the data through WebSocket to the backend
+      socket.emit('send_data', {
+        set1: { ce: ceValue1, pe: peValue1 },
+        set2: { ce: ceValue2, pe: peValue2 },
+      });
+    }
+
+
+    function roundToNearest50(value) {
+        return Math.round(value / 50) * 50;
+    }
+
+    // Function to update both CE and PE fields with the rounded value
+    function updateCEPEFields(ltp) {
+        const roundedValue = roundToNearest50(ltp);
+        const ceInputs = document.querySelectorAll('.ce-input');
+        const peInputs = document.querySelectorAll('.pe-input');
+
+        ceInputs.forEach(input => input.value = roundedValue);
+        peInputs.forEach(input => input.value = roundedValue);
+
+        console.log(document.getElementsByClassName('ce-input')[0].value)
+        // Send data to backend after initializing fields
+        sendDataToBackend();
+    }
+
+    // Listener to initialize CE and PE fields on first update_ltp event
+    function initializeFields(data) {
+        const nifty_ltp = data.nifty_ltp;
+
+        // Update the NF LTP label
+        document.getElementById('nifty-ltp-value').innerText = nifty_ltp;
+
+        // Set CE and PE fields with the rounded value for both groups
+        updateCEPEFields(nifty_ltp);
+
+        // Remove this listener to avoid reinitializing the fields
+        socket.off('update_ltp', initializeFields);
+    }
+    function exit_all(){
+      socket.emit('exit_all');
+        socket.emit('stop_premium_diff');
+    }
+    function full_buy(no){
+      const ceValue = document.getElementsByClassName('ce-input')[no].value;
+      const peValue = document.getElementsByClassName('pe-input')[no].value;
+
+      const ce_quantity = document.getElementsByClassName('bqt-input')[no].value;
+      const pe_quantity = document.getElementsByClassName('sqt-input')[no].value;
+
+      socket.emit('full_buy_order', {
+        set1: { ce: ceValue, pe: peValue },
+        set2: { ce_qt: ce_quantity, pe_qt: pe_quantity }
+      });
+    }
+
+    function partial_buy(no, value_class_name, quant_class_name){
+      const Value = document.getElementsByClassName(value_class_name)[no].value;
+
+      const quantity = document.getElementsByClassName(quant_class_name)[no].value;
+      var type = '';
+      if(value_class_name=='ce-input'){
+        type = 'ce';
+      }
+      else if(value_class_name=='pe-input'){
+        type = 'pe';
+      }
+//      console.log(Value,quantity,type)
+      socket.emit('partial_buy_order', {
+        value: Value, Quantity : quantity, Type:type
+      });
+    }
+
+    function full_sell(no){
+      const ceValue = document.getElementsByClassName('ce-input')[no].value;
+      const peValue = document.getElementsByClassName('pe-input')[no].value;
+
+      const ce_quantity = document.getElementsByClassName('bqt-input')[no].value;
+      const pe_quantity = document.getElementsByClassName('sqt-input')[no].value;
+
+      socket.emit('full_sell_order', {
+        set1: { ce: ceValue, pe: peValue },
+        set2: { ce_qt: ce_quantity, pe_qt: pe_quantity }
+      });
+    }
+
+    function partial_sell(no, value_class_name, quant_class_name){
+      const Value = document.getElementsByClassName(value_class_name)[no].value;
+
+      const quantity = document.getElementsByClassName(quant_class_name)[no].value;
+      var type = '';
+      if(value_class_name=='ce-input'){
+        type = 'ce';
+      }
+      else if(value_class_name=='pe-input'){
+        type = 'pe';
+      }
+//      console.log(Value,quantity,type)
+      socket.emit('partial_sell_order', {
+        value: Value, Quantity : quantity, Type:type
+      });
+    }
+
+    // Attach the initializeFields listener for the first update_ltp event
+    socket.on('update_ltp', initializeFields);
+
+    // Continuously update the Nifty LTP label as new updates arrive
+    socket.on('update_ltp', function (data) {
+        var nifty_ltp = data.nifty_ltp;
+        if(nifty_ltp){
+            document.getElementById('nifty-ltp-value').innerText = nifty_ltp;
+        }
+    });
+
+    // Function to send both sets of CE and PE data to the backend
+
+
+
+    socket.on('connect', function () {
+        console.log('Connected to server');
+        sendDataToBackend();
+    });
+
+    socket.on('disconnect', function () {
+        console.log('Disconnected from server');
+    });
+
+    socket.on('update_opt_ltp', function (data) {
+    // Extract LTP data for set1 and set2
+      var set1_ce_ltp = data.set1.ce_ltp;
+      var set1_pe_ltp = data.set1.pe_ltp;
+      var set2_ce_ltp = data.set2.ce_ltp;
+      var set2_pe_ltp = data.set2.pe_ltp;
+//      var set3_ce_ltp = data.set3.ce_ltp;
+//      var set3_pe_ltp = data.set3.pe_ltp;
+//    console.log(`data ${data}`);
+//    console.log(set1_pe_ltp);
+//    console.log(set2_ce_ltp);
+//    console.log(set2_pe_ltp);
+    if (set1_ce_ltp){
+      document.getElementById('set1-ce-ltp').innerText = set1_ce_ltp;
+    }
+    if (set1_pe_ltp>0){
+      document.getElementById('set1-pe-ltp').innerText = set1_pe_ltp;
+    }
+    if (set2_ce_ltp>0){
+      document.getElementById('set2-ce-ltp').innerText = set2_ce_ltp;
+    }
+    if (set2_pe_ltp>0){
+      document.getElementById('set2-pe-ltp').innerText = set2_pe_ltp;
+    }
+//      if (set3_ce_ltp>0){
+//      document.getElementById('tab2-ce-ltp').innerText = set3_ce_ltp;
+//    }
+//      if (set3_pe_ltp>0){
+//      document.getElementById('tab2-pe-ltp').innerText = set3_pe_ltp;
+//    }
+
+
+    // Update the UI with the LTP values
+
+      set1_ce_ltp =parseFloat(document.getElementById('set1-ce-ltp').innerText);
+//      console.log(`ce ${set1_ce_ltp}`)
+      set1_pe_ltp =parseFloat(document.getElementById('set1-pe-ltp').innerText);
+      set2_ce_ltp =parseFloat(document.getElementById('set2-ce-ltp').innerText);
+      set2_pe_ltp =parseFloat(document.getElementById('set2-pe-ltp').innerText);
+//      console.log(`pe ${set1_pe_ltp} , ce-2${set2_ce_ltp},${set2_pe_ltp}`)
+//      set3_ce_ltp =parseFloat(document.getElementById('tab2-ce-ltp').innerText);
+//      set3_pe_ltp =parseFloat(document.getElementById('tab2-pe-ltp').innerText);
+
+      document.getElementById('cp-1').textContent = (set1_ce_ltp+set1_pe_ltp).toFixed(2);
+
+      document.getElementById('cp-2').textContent = (set2_ce_ltp+set2_pe_ltp).toFixed(2);
+
+//      document.getElementById('cp').textContent = (set3_ce_ltp+set3_pe_ltp).toFixed(2);
+});
+
+    socket.on('pnl_update', (data) => {
+      if (data.error) {
+        console.error('Error:', data.error);
+        return;
+      }
+
+      const positionsTable = document.getElementById('positions-table');
+      const totalPnlElement = document.getElementById('total-pnl');
+
+      // Clear existing table rows
+      positionsTable.innerHTML = '';
+
+      // Populate table rows
+      data.positions.forEach(pos => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pos.symbol}</td>
+          <td>${pos.quantity}</td>
+          <td>${pos.price}</td>
+          <td>${pos.pnl}</td>
+        `;
+        positionsTable.appendChild(row);
+      });
+
+      // Display total P&L
+      totalPnlElement.textContent = `Total P&L: ${data.total_pnl}`;
+    });
+  </script>
+</html>

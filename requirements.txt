@@ -1,0 +1,7 @@
+requests
+websocket_client
+./dist/NorenRestApi-0.0.29-py3-none-any.whl
+pandas~=2.2.3
+pyyaml
+
+Flask~=3.1.0
